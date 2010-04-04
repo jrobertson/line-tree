@@ -36,7 +36,6 @@ class LineTree
       indent, xr = build_branch(a, new_a, cur_indent, prev_indent, x, history )
 
       if xr then
-        history.pop
         cur_indent, xr = build_branch(a, history[-1] || new_a, indent, prev_indent, xr, history ) 
         return [cur_indent, xr] if xr
       end
@@ -59,6 +58,7 @@ class LineTree
       build_tree(a, new_inner_a, cur_indent, history)
     else
       # revert to the earlier new_a
+      history.pop unless history.length <= 1
       return [cur_indent, x]
     end
   end
