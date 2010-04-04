@@ -16,9 +16,7 @@ class LineTree
   end
 
   def to_xml()
-    d = REXML::Formatters::Default.new
-    doc = Document.new '<root/>'
-    scan_line doc.root, @a       
+    scan_line doc.root, a       
     d.write(XPath.first(doc.root, '*'), out='')
     out
   end
