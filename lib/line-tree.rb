@@ -51,7 +51,7 @@ class LineTree
       history << new_inner_a
       build_tree(a, history[-2], cur_indent, history)
     elsif cur_indent == prev_indent then
-      history.pop
+      history.pop unless history.length <= 1
       new_a = history[-1] if history[-1]
       new_inner_a = [x]
       new_a << new_inner_a
