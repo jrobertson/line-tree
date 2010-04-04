@@ -1,4 +1,7 @@
+require 'rexml/document'
+
 class LineTree
+  include REXML
 
   def initialize(lines)
     a = lines.split(/\r?\n|\r(?!\n)/)

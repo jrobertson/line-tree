@@ -1,4 +1,7 @@
+require 'rexml/document'
+
 class LineTree
+include REXML
 
   def initialize(lines)
     a = lines.split(/\r?\n|\r(?!\n)/)
@@ -16,7 +19,9 @@ class LineTree
   end
 
   def to_xml()
-    scan_line doc.root, a       
+    d = REXML::Formatters::Default.new
+    doc = Document.new '<root/>'
+    scan_line doc.root, @a       
     d.write(XPath.first(doc.root, '*'), out='')
     out
   end
