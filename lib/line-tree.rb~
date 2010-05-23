@@ -1,7 +1,7 @@
 require 'rexml/document'
 
 class LineTree
-include REXML
+  include REXML
 
   def initialize(lines)
     a = lines.split(/\r?\n|\r(?!\n)/)
@@ -36,7 +36,6 @@ include REXML
       indent, xr = build_branch(a, new_a, cur_indent, prev_indent, x, history )
 
       if xr then
-        history.pop
         cur_indent, xr = build_branch(a, history[-1] || new_a, indent, prev_indent, xr, history ) 
         return [cur_indent, xr] if xr
       end
@@ -51,7 +50,7 @@ include REXML
       history << new_inner_a
       build_tree(a, history[-2], cur_indent, history)
     elsif cur_indent == prev_indent then
-      history.pop
+      history.pop unless history.length <= 1
       new_a = history[-1] if history[-1]
       new_inner_a = [x]
       new_a << new_inner_a
@@ -59,6 +58,7 @@ include REXML
       build_tree(a, new_inner_a, cur_indent, history)
     else
       # revert to the earlier new_a
+      history.pop unless history.length <= 1
       return [cur_indent, x]
     end
   end

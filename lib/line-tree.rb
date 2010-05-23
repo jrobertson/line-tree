@@ -5,8 +5,8 @@ class LineTree
 
   def initialize(lines)
     a = lines.split(/\r?\n|\r(?!\n)/)
-    pattern = %r((\s+)?(((\/|.)[^\s]+)\s)?([^$]+))
-    a.map!{|x| x.match(pattern).captures.values_at(0,2,4)}
+    pattern = %r((\s+)?(.*))
+    a.map!{|x| x.match(pattern).captures}
 
     new_a, history = [], []
     history << new_a
