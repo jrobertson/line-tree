@@ -4,9 +4,10 @@ class LineTree
   include REXML
 
   def initialize(lines)
+    @lines = lines
     a = lines.split(/\r?\n|\r(?!\n)/)
-    pattern = %r((\s+)?(((\/|.)[^\s]+)\s)?([^$]+))
-    a.map!{|x| x.match(pattern).captures.values_at(0,2,4)}
+    pattern = %r((\s+)?(.*))
+    a.map!{|x| x.match(pattern).captures}
 
     new_a, history = [], []
     history << new_a
@@ -19,11 +20,18 @@ class LineTree
   end
 
   def to_xml()
-    d = REXML::Formatters::Default.new
+    
+    a = @lines.split(/\r?\n|\r(?!\n)/)
+    pattern = %r((\s+)?(((\/|.)[^\s]+)\s)?([^$]+))
+    a.map!{|x| x.match(pattern).captures.values_at(0,2,4)}
+
+    new_a, history = [], []
+    history << new_a
+    build_tree(a, new_a, 0, history)
+        
     doc = Document.new '<root/>'
-    scan_line doc.root, @a       
-    d.write(XPath.first(doc.root, '*'), out='')
-    out
+    scan_line doc.root, new_a       
+    doc.to_s
   end
 
   private
@@ -66,7 +74,8 @@ class LineTree
   def scan_line(node, a)
     a.each do |x|
       name, text = x.shift.compact
-      element = Element.new(name.gsub(/^[^a-zA-Z][^a-zA-Z0-9]?/,'')).add_text text
+      element = Element.new(name.gsub(/^[^a-zA-Z][^a-zA-Z0-9]?/,''))
+      element.add_text text
       scan_line(element, x) unless x.empty?
       node.add element
     end
