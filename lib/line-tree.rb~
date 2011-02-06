@@ -2,15 +2,14 @@
 
 # file: line-tree.rb
 
+require 'rexle'
+
 class LineTree  
 
-  def initialize(lines)
-    @a = scan_shift(lines)
-  end
+  attr_reader :to_a
 
-  def to_a()
-    @a
-  end
+  def initialize(lines) @to_a = scan_shift(lines)  end
+  def to_xml() Rexle.new(scan_a(*@to_a)).xml end
 
   private
 
@@ -27,5 +26,12 @@ class LineTree
       end
     end
   end
+
+  def scan_a(a)
+    r = a.shift.match(/([^\s]+)\s?(.*)/).captures << {}  
+    a.map {|x| r << scan_a(x.clone) } if a.is_a? Array  
+    r
+  end
+
 
 end
