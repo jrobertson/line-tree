@@ -36,7 +36,7 @@ class LineTree
 
   def get_attributes(s)
     a = s[/{(.*)}/,1].split(',').map do |attr|
-      attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);]*)/).captures
+      attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);\-]*)/).captures
     end
 
     Hash[*a.flatten]
