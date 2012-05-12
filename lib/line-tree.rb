@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # file: line-tree.rb
 
@@ -14,11 +14,15 @@ class LineTree
   private
 
   def scan_shift(lines)
-    a = lines.split(/^\b/)
+
+    a = lines.split(/(?=^\S+)/)
+
     a.map do |x|
+
       rlines = x.split(/\n/)
       label = [rlines.shift]
       new_lines = rlines.map{|x| x[2..-1]}
+
       if new_lines.length > 1 then
         label + scan_shift(new_lines.join("\n")) 
       else
@@ -28,7 +32,9 @@ class LineTree
   end
 
   def scan_a(a)
-    r = a.shift.match(/([^\s]+)\s*(\{[^\}]+\})?\s*(.*)/).captures.values_at(0,-1,1)
+
+    r = a.shift.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/).captures.values_at(0,-1,1)
+
     r[-1] = get_attributes(r.last) if r.last
     a.map {|x| r << scan_a(x.clone) } if a.is_a? Array  
     r
