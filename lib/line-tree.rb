@@ -19,21 +19,25 @@ class LineTree
 
     a.map do |x|
 
-      rlines = x.split(/\n/)
-      label = [rlines.shift]
-      new_lines = rlines.map{|x| x[2..-1]}
+      unless x[/.*/][/^\s*\w+:\w+/] then
+        rlines = x.split(/\n/)
+        label = [rlines.shift]
+        new_lines = rlines.map{|x| x[2..-1]}
 
-      if new_lines.length > 1 then
-        label + scan_shift(new_lines.join("\n")) 
+        if new_lines.length > 1 then
+          label + scan_shift(new_lines.join("\n")) 
+        else
+          new_lines.length > 0 ? label + [new_lines] : label
+        end
       else
-        new_lines.length > 0 ? label + [new_lines] : label
+        [x]
       end
     end
   end
 
   def scan_a(a)
 
-    r = a.shift.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/).captures.values_at(0,-1,1)
+    r = a.shift.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m).captures.values_at(0,-1,1)
 
     r[-1] = get_attributes(r.last) if r.last
     a.map {|x| r << scan_a(x.clone) } if a.is_a? Array  
