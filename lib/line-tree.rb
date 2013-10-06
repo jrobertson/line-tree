@@ -19,7 +19,7 @@ class LineTree
 
     a.map do |x|
 
-      unless x[/.*/][/^\s*\w+:\w+/] then
+      unless x[/.*/][/^\s*\w+:\S+/] then
         rlines = x.split(/\n/)
         label = [rlines.shift]
         new_lines = rlines.map{|x| x[2..-1]}
