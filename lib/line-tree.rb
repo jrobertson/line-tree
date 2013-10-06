@@ -30,7 +30,7 @@ class LineTree
           new_lines.length > 0 ? label + [new_lines] : label
         end
       else
-        [x]
+        [x.gsub(/^\s{2}/,'')]
       end
     end
   end
