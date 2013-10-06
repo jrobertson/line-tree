@@ -30,7 +30,7 @@ class LineTree
           new_lines.length > 0 ? label + [new_lines] : label
         end
       else
-        [x.gsub(/^\s{2}/,'')]
+        [x.lines.map{|x| x.sub(/^\s{2}/,'')}.join]
       end
     end
   end
@@ -45,6 +45,7 @@ class LineTree
   end
 
   def get_attributes(s)
+
     a = s[/{(.*)}/,1].split(',').map do |attr|
       attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);\-\/:\.\s]*)/).captures
     end
