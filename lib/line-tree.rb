@@ -37,7 +37,8 @@ class LineTree
 
   def scan_a(a)
 
-    r = a.shift.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m).captures.values_at(0,-1,1)
+    r = a.shift.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m)
+          .captures.values_at(0,-1,1)
 
     r[-1] = get_attributes(r.last) if r.last
     a.map {|x| r << scan_a(x.clone) } if a.is_a? Array  
@@ -47,7 +48,8 @@ class LineTree
   def get_attributes(s)
 
     a = s[/{(.*)}/,1].split(',').map do |attr|
-      attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);\-\/:\.\s]*)/).captures
+      name, val = attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);\-\/:\.\s"']*)/).captures
+      [name, val.sub(/['"]$/,'')]
     end
 
     Hash[*a.flatten]
