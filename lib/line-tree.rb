@@ -48,7 +48,7 @@ class LineTree
   def get_attributes(s)
 
     a = s[/{(.*)}/,1].split(',').map do |attr|
-      name, val = attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);\-\/:\.\s"']*)/).captures
+      name, val = attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);\-\/:\.\s"'_]*)/).captures
       [name, val.sub(/['"]$/,'')]
     end
 
