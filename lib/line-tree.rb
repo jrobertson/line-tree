@@ -8,7 +8,7 @@ class LineTree
 
   attr_reader :to_a
 
-  def initialize(lines) @to_a = scan_shift(lines)  end
+  def initialize(lines) @to_a = scan_shift(lines.strip)  end
   def to_xml(options={}) Rexle.new(scan_a(*@to_a)).xml(options) end
 
   private
