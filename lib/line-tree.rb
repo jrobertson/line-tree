@@ -36,12 +36,25 @@ class LineTree
   end
 
   def scan_a(a)
+    
+    s = a.shift
+    r = s.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m)
+                                                 .captures.values_at(0,-1,1)
 
-    r = a.shift.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m)
-          .captures.values_at(0,-1,1)
+    if r.last then
+      
+      r[-1] = get_attributes(r.last)
+      
+    elsif s[/(\w+\s*=\s*["'])/]
+      
+      raw_attributes, value = s.split(/(?=[^'"]+$)/,2)
+      r[-1] = get_xml_attributes raw_attributes
+      r[1] = value.strip
 
-    r[-1] = get_attributes(r.last) if r.last
+    end
+    
     a.map {|x| r << scan_a(x.clone) } if a.is_a? Array  
+    
     r
   end
 
@@ -54,5 +67,19 @@ class LineTree
 
     Hash[*a.flatten]
   end
+  
+  def get_xml_attributes(raw_attributes)
+    
+    r1 = /([\w\-:]+\='[^']*)'/
+    r2 = /([\w\-:]+\="[^"]*)"/
+    
+    r =  raw_attributes.scan(/#{r1}|#{r2}/).map(&:compact).flatten.inject({}) do |r, x|
+      attr_name, val = x.split(/=/,2) 
+      r.merge(attr_name.to_sym => val[1..-1])
+    end
+
+    return r
+  end
+  
 
 end

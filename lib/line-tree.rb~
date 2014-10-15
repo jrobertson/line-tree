@@ -8,7 +8,7 @@ class LineTree
 
   attr_reader :to_a
 
-  def initialize(lines) @to_a = scan_shift(lines)  end
+  def initialize(lines) @to_a = scan_shift(lines.strip)  end
   def to_xml(options={}) Rexle.new(scan_a(*@to_a)).xml(options) end
 
   private
@@ -19,33 +19,67 @@ class LineTree
 
     a.map do |x|
 
-      rlines = x.split(/\n/)
-      label = [rlines.shift]
-      new_lines = rlines.map{|x| x[2..-1]}
+      unless x[/.*/][/^\s*\w+:\S+/] then
+        rlines = x.split(/\n/)
+        label = [rlines.shift]
+        new_lines = rlines.map{|x| x[2..-1]}
 
-      if new_lines.length > 1 then
-        label + scan_shift(new_lines.join("\n")) 
+        if new_lines.length > 1 then
+          label + scan_shift(new_lines.join("\n")) 
+        else
+          new_lines.length > 0 ? label + [new_lines] : label
+        end
       else
-        new_lines.length > 0 ? label + [new_lines] : label
+        [x.lines.map{|x| x.sub(/^\s{2}/,'')}.join]
       end
     end
   end
 
   def scan_a(a)
+    
+    s = a.shift
+    r = s.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m)
+          .captures.values_at(0,-1,1)
 
-    r = a.shift.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/).captures.values_at(0,-1,1)
+    if r.last then
+      
+      r[-1] = get_attributes(r.last)
+      
+    elsif s[/(\w+\s*=\s*["'])/]
+      
+      raw_attributes, value = s.split(/(?=[^'"]+$)/,2)
+      r[-1] = get_xml_attributes raw_attributes
+      r[1] = value.strip
 
-    r[-1] = get_attributes(r.last) if r.last
+    end
+    
     a.map {|x| r << scan_a(x.clone) } if a.is_a? Array  
+    
     r
   end
 
   def get_attributes(s)
+
     a = s[/{(.*)}/,1].split(',').map do |attr|
-      attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);\-]*)/).captures
+      name, val = attr.match(/\s*([^:=]+)[:=]\s*['"]*([a-zA-Z0-9\(\);\-\/:\.\s"'_]*)/).captures
+      [name, val.sub(/['"]$/,'')]
     end
 
     Hash[*a.flatten]
   end
+  
+  def get_xml_attributes(raw_attributes)
+    
+    r1 = /([\w\-:]+\='[^']*)'/
+    r2 = /([\w\-:]+\="[^"]*)"/
+    
+    r =  raw_attributes.scan(/#{r1}|#{r2}/).map(&:compact).flatten.inject({}) do |r, x|
+      attr_name, val = x.split(/=/,2) 
+      r.merge(attr_name.to_sym => val[1..-1])
+    end
+
+    return r
+  end
+  
 
 end
