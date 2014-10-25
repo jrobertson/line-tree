@@ -39,7 +39,7 @@ class LineTree
     
     s = a.shift
     r = s.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m)
-          .captures.values_at(0,-1,1)
+                                                 .captures.values_at(0,-1,1)
 
     if r.last then
       
