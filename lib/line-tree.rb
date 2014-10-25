@@ -49,7 +49,7 @@ class LineTree
       
       raw_attributes, value = s.split(/(?=[^'"]+$)/,2)
       r[-1] = get_xml_attributes raw_attributes
-      r[1] = value.strip
+      r[1] = value.to_s.strip
 
     end
     
