@@ -8,12 +8,14 @@ class LineTree
 
   attr_reader :to_a
 
-  def initialize(lines) @to_a = scan_shift(lines.strip)  end
+  def initialize(lines, level: nil) @to_a = scan_shift(lines.strip, level)  end
   def to_xml(options={}) Rexle.new(scan_a(*@to_a)).xml(options) end
 
   private
 
-  def scan_shift(lines)
+  def scan_shift(lines, level=nil)
+
+    level -= 1 if level
 
     a = lines.split(/(?=^\S+)/)
 
@@ -25,7 +27,19 @@ class LineTree
         new_lines = rlines.map{|x| x[2..-1]}
 
         if new_lines.length > 1 then
-          label + scan_shift(new_lines.join("\n")) 
+
+          if level then
+
+            if level < 1 then
+
+              [(label + new_lines).join("\n")]
+            else
+              label + scan_shift(new_lines.join("\n"),level) 
+            end
+          else
+            label + scan_shift(new_lines.join("\n"),level) 
+          end          
+          
         else
           new_lines.length > 0 ? label + [new_lines] : label
         end
@@ -33,6 +47,7 @@ class LineTree
         [x.lines.map{|x| x.sub(/^\s{2}/,'')}.join]
       end
     end
+
   end
 
   def scan_a(a)
