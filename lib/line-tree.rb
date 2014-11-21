@@ -9,7 +9,11 @@ class LineTree
   attr_reader :to_a
 
   def initialize(lines, level: nil) @to_a = scan_shift(lines.strip, level)  end
-  def to_xml(options={}) Rexle.new(scan_a(*@to_a)).xml(options) end
+    
+  def to_xml(options={})
+    a = scan_a(*@to_a).first
+    Rexle.new(a).xml(options)
+  end
 
   private
 
@@ -53,9 +57,11 @@ class LineTree
   def scan_a(a)
     
     s = a.shift
+    non_element = s[/^\s*(\w+:)/,1]    
+    return [nil,non_element] if non_element
+    
     r = s.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m)
                                                  .captures.values_at(0,-1,1)
-
     if r.last then
       
       r[-1] = get_attributes(r.last)
@@ -68,9 +74,19 @@ class LineTree
 
     end
     
-    a.map {|x| r << scan_a(x.clone) } if a.is_a? Array  
+    if a.is_a? Array then
+      
+      a.map do |x|
+        result, remaining = scan_a(x.clone) 
+
+        if remaining then
+          r.last ?  r << remaining :  r[1] += remaining  
+        end
+        r << result
+      end
+    end
     
-    r
+    [r, non_element]
   end
 
   def get_attributes(s)
