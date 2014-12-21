@@ -8,7 +8,11 @@ class LineTree
 
   attr_reader :to_a
 
-  def initialize(lines, level: nil) @to_a = scan_shift(lines.strip, level)  end
+  def initialize(lines, level: nil, ignore_non_element: true)
+    
+    @ignore_non_element = ignore_non_element
+    @to_a = scan_shift(lines.strip, level)
+  end
     
   def to_xml(options={})
     a = scan_a(*@to_a).first
@@ -57,8 +61,11 @@ class LineTree
   def scan_a(a)
     
     s = a.shift
-    non_element = s[/^\s*(\w+:)/,1]    
-    return [nil,non_element] if non_element
+    
+    if @ignore_non_element then
+      non_element = s[/^\s*(\w+:)/,1]    
+      return [nil,non_element] if non_element
+    end
     
     r = s.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m)
                                                  .captures.values_at(0,-1,1)
