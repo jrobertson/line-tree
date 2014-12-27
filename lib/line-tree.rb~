@@ -30,27 +30,19 @@ class LineTree
     a.map do |x|
 
       unless x[/.*/][/^\s*\w+:\S+/] then
+
         rlines = x.split(/\n/)
+        rlines = [x] if level and level < 0
+        
         label = [rlines.shift]
         new_lines = rlines.map{|x| x[2..-1]}
 
         if new_lines.length > 1 then
-
-          if level then
-
-            if level < 1 then
-
-              [(label + new_lines).join("\n")]
-            else
-              label + scan_shift(new_lines.join("\n"),level) 
-            end
-          else
-            label + scan_shift(new_lines.join("\n"),level) 
-          end          
-          
-        else
-          new_lines.length > 0 ? label + [new_lines] : label
+          label + scan_shift(new_lines.join("\n"),level)           
+        else          
+          new_lines.length > 0 ? label + [new_lines] : label          
         end
+        
       else
         [x.lines.map{|x| x.sub(/^\s{2}/,'')}.join]
       end
