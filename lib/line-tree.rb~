@@ -8,9 +8,11 @@ class LineTree
 
   attr_reader :to_a
 
-  def initialize(lines, level: nil, ignore_non_element: true)
+  def initialize(lines, level: nil, ignore_non_element: true, 
+                                                  ignore_blank_lines: true)
     
     @ignore_non_element = ignore_non_element
+    @ignore_blank_lines = ignore_blank_lines
     @to_a = scan_shift(lines.strip, level)
   end
     
@@ -31,7 +33,7 @@ class LineTree
             
       unless x[/.*/][/^\s*\w+:\S+/] then
 
-        rlines = (x).split(/\n/,-1) #[0..-2]
+        rlines = @ignore_blank_lines ? (x).split(/\n/) : (x).split(/\n/,-1)
         rlines = [x] if level and level < 0
         label = [rlines.shift]
         new_lines = rlines.map{|x| x[2..-1]}

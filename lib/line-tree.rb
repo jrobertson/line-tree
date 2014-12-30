@@ -34,14 +34,16 @@ class LineTree
       unless x[/.*/][/^\s*\w+:\S+/] then
 
         rlines = @ignore_blank_lines ? (x).split(/\n/) : (x).split(/\n/,-1)
-        rlines = [x] if level and level < 0
+
+        rlines = [x.gsub(/^\s{2}/,'')] if level and level < 0
         label = [rlines.shift]
         new_lines = rlines.map{|x| x[2..-1]}
 
         if new_lines.length > 1 then
           label + scan_shift(new_lines.join("\n"),level)           
         else          
-          (new_lines.length > 0 and new_lines != [nil])? label + [new_lines] : label          
+          (new_lines.length > 0 and \
+                            new_lines != [nil])? label + [new_lines] : label
         end
         
       else
