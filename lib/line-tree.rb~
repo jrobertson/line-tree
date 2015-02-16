@@ -73,8 +73,8 @@ class LineTree
     elsif s[/(\w+\s*=\s*["'])/]
       
       raw_attributes, value = s.split(/(?=[^'"]+$)/,2)
-      r[-1] = get_xml_attributes raw_attributes
-      r[1] = value.to_s.strip
+      r[1] = get_xml_attributes raw_attributes
+      r[-1] = value.to_s.strip
 
     end
     
@@ -84,7 +84,7 @@ class LineTree
         result, remaining = scan_a(x.clone) 
 
         if remaining then
-          r.last ?  r << remaining :  r[1] += remaining  
+          r.last ?  r << remaining :  r[-1] += remaining  
         end
         r << result
       end

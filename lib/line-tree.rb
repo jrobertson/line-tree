@@ -65,10 +65,11 @@ class LineTree
     end
     
     r = s.match(/('[^']+[']|[^\s]+)\s*(\{[^\}]+\})?\s*(.*)/m)
-                                                 .captures.values_at(0,-1,1)
-    if r.last then
+                                                 .captures.values_at(0,1,-1)
+
+    if r[1] then
       
-      r[-1] = get_attributes(r.last)
+      r[1] = get_attributes(r[1])
       
     elsif s[/(\w+\s*=\s*["'])/]
       
