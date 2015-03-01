@@ -14,7 +14,7 @@ class LineTree
     @ignore_non_element = ignore_non_element
     @ignore_label = ignore_label
     
-    lines = ignore_blank_lines ? s.gsub(/^$\n/,'') : s
+    lines = ignore_blank_lines ? s.gsub(/^\s*$\n/,'') : s
     @to_a = scan_shift(lines.strip, level)
   end
     
