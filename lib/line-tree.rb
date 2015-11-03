@@ -67,7 +67,7 @@ class LineTree
     
     r = s.match(/('[^']+[']|[^\s]+)\s*(\{.*\})?\s*(.*)/m)
                                                  .captures.values_at(0,1,-1)
-    puts 'r: ' + r.inspect
+
     if r[1] then
       
       r[1] = get_attributes(r[1])
@@ -98,13 +98,12 @@ class LineTree
   def get_attributes(s)
     
     a = s.scan(/\w+: ["'][^"']+["']/).map do |attr|
-      puts 'attr: ' + attr.inspect
+
       name, val = attr.match(/\s*([^:=]+)[:=]\s*['"]*\
 ([a-zA-Z0-9\(\);\-\/:\.,\s"'_\{\}\$]*)/).captures
       [name, val.sub(/['"]$/,'')]
     end
 
-    puts 'a: ' + a.inspect
     Hash[*a.flatten]
   end
   
