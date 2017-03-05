@@ -13,8 +13,10 @@ class LineTree
     
     @ignore_non_element = ignore_non_element
     @ignore_label = ignore_label
+    @ignore_blank_lines = ignore_blank_lines
     
-    lines = ignore_blank_lines ? s.gsub(/^\s*$\n/,'') : s
+    lines = ignore_blank_lines ? s.gsub(/^ *$\n/,'') : s
+
     @to_a = scan_shift(lines.strip, level)
   end
     
@@ -31,16 +33,16 @@ class LineTree
 
     a = lines.split(/(?=^\S+)/)
 
-    a.map do |x|
+    a.map do |x|      
 
-      if @ignore_label == true or not x[/.*/][/^\s*\w+:\S+/] then
+      if @ignore_label == true or not x[/.*/][/^ *\w+:\S+/] then
 
-        rlines = (x).split(/\n/,-1)
+        rlines = x.lines.map {|x| x.sub(/(.)\n$/,'\1')}
 
-        rlines = [x.gsub(/^\s{2}/,'')] if level and level < 0
+        rlines = [x.gsub(/^ {2}/,'')] if level and level < 0
         label = [rlines.shift]
-        new_lines = rlines.map{|x| x[2..-1]}
-
+        new_lines = rlines.map{|x| x.sub(/^ {2}/,'')}
+        
         if new_lines.length > 1 then
           label + scan_shift(new_lines.join("\n"),level)           
         else          
@@ -49,10 +51,9 @@ class LineTree
         end
         
       else
-        [x.lines.map{|x| x.sub(/^\s{2}/,'')}.join]
+        [x.lines.map{|x| x.sub(/^ {2}/,'')}.join]
       end
     end
-    
 
   end
 
@@ -61,18 +62,18 @@ class LineTree
     s = a.shift
     
     if @ignore_non_element then
-      non_element = s[/^\s*(\w+:)/,1]    
+      non_element = s[/^ *(\w+:)/,1]    
       return [nil,non_element] if non_element
     end
     
-    r = s.match(/('[^']+[']|[^\s]+)\s*(\{.*\})?\s*(.*)/m)
+    r = s.match(/('[^']+[']|[^ ]+) *(\{.*\})? *(.*)/m)
                                                  .captures.values_at(0,1,-1)
 
     if r[1] then
       
       r[1] = get_attributes(r[1])
       
-    elsif s[/(\w+\s*=\s*["'])/]
+    elsif s[/(\w+ *= *["'])/]
       
       raw_attributes, value = s.split(/(?=[^'"]+$)/,2)
       r[1] = get_xml_attributes raw_attributes
