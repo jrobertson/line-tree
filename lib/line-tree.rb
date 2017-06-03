@@ -33,6 +33,8 @@ class LineTree
 
     a = lines.split(/(?=^\S+)/)
 
+    return [a] if a.length <= 1 and a.first.strip.empty?
+    
     a.map do |x|      
 
       if @ignore_label == true or not x[/.*/][/^ *\w+:\S+/] then

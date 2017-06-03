@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'line-tree'
-  s.version = '0.5.7'
+  s.version = '0.5.8'
   s.summary = 'line-tree'
   s.description = 'Line-tree parses indented lines of text and returns an array representing a tree structure.'
   s.authors = ['James Robertson']
