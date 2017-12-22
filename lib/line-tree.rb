@@ -4,12 +4,13 @@
 
 require 'rexle'
 
+
 class LineTree
 
   attr_reader :to_a
 
   def initialize(s, level: nil, ignore_non_element: true, 
-                              ignore_blank_lines: true, ignore_label: false)
+         ignore_blank_lines: true, ignore_label: false)
     
     @ignore_non_element = ignore_non_element
     @ignore_label = ignore_label
@@ -31,6 +32,7 @@ class LineTree
 
     level -= 1 if level
 
+    return [] if lines.strip.empty?
     a = lines.split(/(?=^\S+)/)
 
     return [a] if a.length <= 1 and a.first.strip.empty?
@@ -39,12 +41,15 @@ class LineTree
 
       if @ignore_label == true or not x[/.*/][/^ *\w+:\S+/] then
 
-        rlines = x.lines.map {|x| x.sub(/(.)\n$/,'\1')}
+        rlines = x.lines.map do |x|
+          x.sub(/(.)\n$/,'\1')
+        end
 
         rlines = [x.gsub(/^ {2}/,'')] if level and level < 0
+
         label = [rlines.shift]
         new_lines = rlines.map{|x| x.sub(/^ {2}/,'')}
-        
+
         if new_lines.length > 1 then
           label + scan_shift(new_lines.join("\n"),level)           
         else          
