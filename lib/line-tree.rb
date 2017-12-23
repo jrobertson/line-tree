@@ -10,11 +10,12 @@ class LineTree
   attr_reader :to_a
 
   def initialize(s, level: nil, ignore_non_element: true, 
-         ignore_blank_lines: true, ignore_label: false)
+         ignore_blank_lines: true, ignore_label: false, ignore_newline: true)
     
     @ignore_non_element = ignore_non_element
     @ignore_label = ignore_label
     @ignore_blank_lines = ignore_blank_lines
+    @ignore_newline = ignore_newline
     
     lines = ignore_blank_lines ? s.gsub(/^ *$\n/,'') : s
 
@@ -41,20 +42,35 @@ class LineTree
 
       if @ignore_label == true or not x[/.*/][/^ *\w+:\S+/] then
 
-        rlines = x.lines.map do |x|
-          x.sub(/(.)\n$/,'\1')
+        rlines = if @ignore_newline then
+          x.lines.map {|x| x.sub(/(.)\n$/,'\1') }
+        else
+          x.lines
         end
-
+      
         rlines = [x.gsub(/^ {2}/,'')] if level and level < 0
 
         label = [rlines.shift]
         new_lines = rlines.map{|x| x.sub(/^ {2}/,'')}
 
         if new_lines.length > 1 then
-          label + scan_shift(new_lines.join("\n"),level)           
+          separator = @ignore_newline ? "\n" : ''
+          label + scan_shift(new_lines.join(separator),level)           
+
         else          
-          (new_lines.length > 0 and \
-                            new_lines != [nil])? label + [new_lines] : label
+
+          #label = [] if label == ["\n"]
+          
+          if (new_lines.length > 0 and new_lines != [nil]) then
+            
+            if label == ["\n"] then
+              [new_lines]
+            else
+              label + [new_lines]
+            end
+          else
+            label
+          end
         end
         
       else
