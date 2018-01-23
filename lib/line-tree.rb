@@ -9,8 +9,11 @@ class LineTree
 
   attr_reader :to_a
 
-  def initialize(s, level: nil, ignore_non_element: true, 
-         ignore_blank_lines: true, ignore_label: false, ignore_newline: true)
+  def initialize(raw_s, level: nil, ignore_non_element: true, 
+                 ignore_blank_lines: true, ignore_label: false, 
+                 ignore_newline: true, root: nil)
+    
+    s = root ? root + "\n" + raw_s.lines.map {|x| '  ' + x}.join : raw_s
     
     @ignore_non_element = ignore_non_element
     @ignore_label = ignore_label
