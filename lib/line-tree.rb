@@ -21,10 +21,13 @@ class LineTree
 
     @to_a = scan_shift(lines.strip, level)
   end
+  
+  def to_doc()    
+    Rexle.new(scan_a(*@to_a).first)
+  end
     
   def to_xml(options={})
-    a = scan_a(*@to_a).first
-    Rexle.new(a).xml(options)
+    to_doc.xml(options)
   end
 
   private
