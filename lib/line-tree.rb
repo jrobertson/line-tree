@@ -80,7 +80,7 @@ class LineTree
         end
         
       else
-        [x.lines.map{|x| x.sub(/^ {2}/,'')}.join]
+        [x.lines.map{|x| x.sub(/^ {2}/,'').chomp }.join]
       end
     end
 
