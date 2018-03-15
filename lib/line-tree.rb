@@ -11,7 +11,7 @@ class LineTree
 
   def initialize(raw_s, level: nil, ignore_non_element: true, 
                  ignore_blank_lines: true, ignore_label: false, 
-                 ignore_newline: true, root: nil)
+                 ignore_newline: true, root: nil, debug: false)
     
     s = root ? root + "\n" + raw_s.lines.map {|x| '  ' + x}.join : raw_s
     
@@ -19,14 +19,29 @@ class LineTree
     @ignore_label = ignore_label
     @ignore_blank_lines = ignore_blank_lines
     @ignore_newline = ignore_newline
+    @debug = debug
     
     lines = ignore_blank_lines ? s.gsub(/^ *$\n/,'') : s
 
     @to_a = scan_shift(lines.strip, level)
+    
   end
   
-  def to_doc()    
-    Rexle.new(scan_a(*@to_a).first)
+  def to_doc(encapsulate: false)    
+    
+    a = @to_a
+    
+    a2 = if a[0].is_a? Array then      
+      encapsulate ? encap(a) : scan_a(a)
+    else
+      scan_a(*a)
+    end
+    
+    a2.unshift('root', {})
+    puts 'a2: ' + a2.inspect if @debug
+    
+    Rexle.new(a2)
+    
   end
     
   def to_xml(options={})
@@ -34,6 +49,34 @@ class LineTree
   end
 
   private
+  
+  def encap(a)
+    
+    puts '_a: ' + a.inspect
+    
+    a.each do |node|
+
+      encap node[-1] if node[-1].is_a? Array
+      
+      if node.is_a? Array then
+        val = node[0]
+        node.insert 1, {}, val
+        node[0] = 'entry'
+      end
+
+    end
+    
+    puts '2a: ' + a.inspect
+    
+    if a.first.is_a? String then
+      val = a[0]
+      a.insert 1, {}, val
+      a[0] = 'entry'
+    end
+    
+    a
+
+  end
 
   def scan_shift(lines, level=nil)
 
