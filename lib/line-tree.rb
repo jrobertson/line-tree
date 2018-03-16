@@ -56,7 +56,9 @@ class LineTree
         
     a.each do |node|
 
-      encap node[-1] if node[-1].is_a? Array
+      puts 'node: ' + node.inspect if @debug
+      
+      encap node[1..-1] if node[1].is_a? Array
       
       if node.is_a? Array then
         val = node[0]
