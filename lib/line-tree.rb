@@ -13,6 +13,7 @@ class LineTree
                  ignore_blank_lines: true, ignore_label: false, 
                  ignore_newline: true, root: nil, debug: false)
     
+    puts 'inside linetree' if @debug
     s = root ? root + "\n" + raw_s.lines.map {|x| '  ' + x}.join : raw_s
     
     @ignore_non_element = ignore_non_element
@@ -34,6 +35,7 @@ class LineTree
     a2 = if a[0].is_a? Array then      
       encapsulate ? encap(a) : scan_a(a)
     else
+      puts 'before scan_a' if @debug
       scan_a(*a)
     end
     
@@ -124,45 +126,39 @@ class LineTree
     end
 
   end
-
+  
   def scan_a(a)
     
-    s = a.shift
+    puts 'a: ' + a.inspect if @debug
     
-    if @ignore_non_element then
-      non_element = s[/^ *(\w+:)/,1]    
-      return [nil,non_element] if non_element
-    end
-    
-    r = s.match(/('[^']+[']|[^ ]+) *(\{.*\})? *(.*)/m)
-                                                 .captures.values_at(0,1,-1)
+    a.each do |node|
 
-    if r[1] then
+      scan_a node[-1] if node[-1].is_a? Array
       
-      r[1] = get_attributes(r[1])
-      
-    elsif s[/(\w+ *= *["'])/]
-      
-      raw_attributes, value = s.split(/(?=[^'"]+$)/,2)
-      r[1] = get_xml_attributes raw_attributes
-      r[-1] = value.to_s.strip
-
-    end
-    
-    if a.is_a? Array then
-      
-      a.map do |x|
-        result, remaining = scan_a(x.clone) 
-
-        if remaining then
-          r.last ?  r << remaining :  r[-1] += remaining  
-        end
-        r << result
+      if node.is_a? Array then
+        r = parse_node(node[0])
+        node[0] = r[0]; node.insert 1, r[1], r[2]        
       end
+
+    end
+        
+    if a.first.is_a? String then
+      
+      s = a[0]
+      
+      if @ignore_non_element then
+        non_element = s[/^ *(\w+:)/,1]    
+        return [nil,non_element] if non_element
+      end      
+      
+        r = parse_node(s)
+        a[0] = r[0]; a.insert 1, r[1], r[2]        
     end
     
-    [r, non_element]
+    a
+
   end
+
 
   def get_attributes(s)
     
@@ -189,5 +185,24 @@ class LineTree
     return r
   end
   
+  def parse_node(s)
+    
+    r = s.match(/('[^']+[']|[^ ]+) *(\{.*\})? *(.*)/m)
+                                                .captures.values_at(0,1,-1)
+
+    if r[1] then
+      
+      r[1] = get_attributes(r[1])
+      
+    elsif s[/(\w+ *= *["'])/]
+      
+      raw_attributes, value = s.split(/(?=[^'"]+$)/,2)
+      r[1] = get_xml_attributes raw_attributes
+      r[-1] = value.to_s.strip
+
+    end      
+    
+    r
+  end
 
 end
