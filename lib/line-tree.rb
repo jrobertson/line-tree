@@ -51,9 +51,7 @@ class LineTree
   private
   
   def encap(a)
-    
-    puts '_a: ' + a.inspect
-    
+        
     a.each do |node|
 
       encap node[-1] if node[-1].is_a? Array
@@ -65,9 +63,7 @@ class LineTree
       end
 
     end
-    
-    puts '2a: ' + a.inspect
-    
+        
     if a.first.is_a? String then
       val = a[0]
       a.insert 1, {}, val
