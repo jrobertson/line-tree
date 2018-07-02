@@ -89,6 +89,8 @@ class LineTree
     
     a.map do |x|      
 
+      x.sub!(/ *$/,'')
+      
       if @ignore_label == true or not x[/.*/][/^ *\w+:\S+/] then
 
         rlines = if @ignore_newline then
