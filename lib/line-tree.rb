@@ -23,7 +23,7 @@ class LineTree
     @debug = debug
     
     lines = ignore_blank_lines ? s.gsub(/^ *$\n/,'') : s
-
+    puts 'lines : ' + lines.inspect if @debug
     @to_a = scan_shift(lines.strip, level)
     
   end
@@ -89,6 +89,8 @@ class LineTree
     
     a.map do |x|      
 
+      puts 'x: ' + x.inspect if @debug
+      
       x.sub!(/ *$/,'')
       
       if @ignore_label == true or not x[/.*/][/^ *\w+:\S+/] then
@@ -125,7 +127,15 @@ class LineTree
         end
         
       else
-        [x.lines.map{|x| x.sub(/^ {2}/,'').chomp }.join]
+        
+        puts 'chomp' if @debug
+        puts 'level: ' + level.inspect if @debug
+        
+        if level and level < 1 then
+          [x]
+        else
+          [x.lines.map{|x| x.sub(/^ {2}/,'').chomp }.join]
+        end
       end
     end
 
