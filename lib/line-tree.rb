@@ -147,7 +147,7 @@ class LineTree
     
     a.each do |node|
 
-      scan_a node[-1] if node[-1].is_a? Array
+      scan_a node[1..-1] if node[1..-1].is_a? Array
       
       if node.is_a? Array then
         r = parse_node(node[0])
