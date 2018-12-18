@@ -6,14 +6,15 @@ require 'rexle'
 
 
 class LineTree
-
+  using ColouredText
+  
   attr_reader :to_a
 
   def initialize(raw_s, level: nil, ignore_non_element: true, 
                  ignore_blank_lines: true, ignore_label: false, 
                  ignore_newline: true, root: nil, debug: false)
     
-    puts 'inside linetree' if @debug
+    puts 'inside linetree'.info if @debug
     s = root ? root + "\n" + raw_s.lines.map {|x| '  ' + x}.join : raw_s
     
     @ignore_non_element = ignore_non_element
@@ -23,7 +24,7 @@ class LineTree
     @debug = debug
     
     lines = ignore_blank_lines ? s.gsub(/^ *$\n/,'') : s
-    puts 'lines : ' + lines.inspect if @debug
+    puts ('lines : ' + lines.inspect).debug if @debug
     @to_a = scan_shift(lines.strip, level)
     
   end
@@ -43,6 +44,16 @@ class LineTree
     puts 'a2: ' + a2.inspect if @debug
     
     Rexle.new(a2)
+    
+  end
+  
+  def to_html(numbered: false)
+    
+    @numbered = numbered
+    s = "<ul>%s</ul>" % make_html_list(@to_a)
+    puts ('s: ' + s.inspect).debug if @debug
+    puts s
+    Rexle.new(s).xml pretty: true, declaration: false
     
   end
     
@@ -77,6 +88,51 @@ class LineTree
     a
 
   end
+  
+  def make_html_list(a, indent=-1, count=nil)
+
+    puts 'inside make_html_list'.info if @debug
+    
+    items = a.map.with_index do |x, i|    
+      
+      puts ('x:'  + x.inspect).debug if @debug
+      
+      if x.is_a? Array then
+
+        id, head, tail = if count then 
+         
+          [
+            count.to_s + '.' + i.to_s, 
+            i == 1 ? "<ul>\n" : '', 
+            i == a.length - 1 ? "</li>\n</ul>" : \
+                i == a.length - 1 ? '</ul></li>' : '</li>'
+          ]
+
+        else
+          [i+1, '', '']
+        end
+
+        head + make_html_list(x, indent+1, id) + tail
+        
+      else
+
+        #"%s%s %s" % ['  ' * indent, count, x]
+        r = if @numbered then
+          "%s<li id='n%s'>%s" % ['  ' * indent, count.to_s.gsub('.','-'), x]
+        else
+          "%s<li>%s" % ['  ' * indent, x]
+        end
+        
+        i == 1 ? "<ul>" + r : r
+
+      end
+
+    end
+
+    items.join("\n")
+
+  end
+  
 
   def scan_shift(lines, level=nil)
 
