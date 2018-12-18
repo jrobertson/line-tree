@@ -52,8 +52,8 @@ class LineTree
     @numbered = numbered
     s = "<ul>%s</ul>" % make_html_list(@to_a)
     puts ('s: ' + s.inspect).debug if @debug
-    puts s
-    Rexle.new(s).xml pretty: true, declaration: false
+    puts s if @debug
+    Rexle.new(s).xml declaration: false
     
   end
     
@@ -104,8 +104,7 @@ class LineTree
           [
             count.to_s + '.' + i.to_s, 
             i == 1 ? "<ul>\n" : '', 
-            i == a.length - 1 ? "</li>\n</ul>" : \
-                i == a.length - 1 ? '</ul></li>' : '</li>'
+            i == a.length - 1 ? "\n</ul>\n</li>" : ''
           ]
 
         else
@@ -123,7 +122,7 @@ class LineTree
           "%s<li>%s" % ['  ' * indent, x]
         end
         
-        i == 1 ? "<ul>" + r : r
+        i == 1 ? "<ul>" + r  : i == a.length - 1 ? r + "</li>" : r + ""
 
       end
 
