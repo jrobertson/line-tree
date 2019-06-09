@@ -14,8 +14,11 @@ class LineTree
                  ignore_blank_lines: true, ignore_label: false, 
                  ignore_newline: true, root: nil, debug: false)
     
+    
     puts 'inside linetree'.info if @debug
-    s = root ? root + "\n" + raw_s.lines.map {|x| '  ' + x}.join : raw_s
+    
+    @root = root
+    s =  raw_s
     
     @ignore_non_element = ignore_non_element
     @ignore_label = ignore_label
@@ -39,11 +42,14 @@ class LineTree
       puts 'before scan_a' if @debug
       scan_a(*a)
     end
+
     
-    a2.unshift('root', {})
-    puts 'a2: ' + a2.inspect if @debug
     
-    Rexle.new(a2)
+    a3 = @root ? a2.unshift(@root, {}) : a2.flatten(1)
+      
+    puts 'a3: ' + a3.inspect if @debug  
+
+    Rexle.new(a3)
     
   end
   
