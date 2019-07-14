@@ -204,17 +204,31 @@ class LineTree
   
   def scan_a(a)
     
-    puts 'a: ' + a.inspect if @debug
+    puts 'a: ' + a.inspect if @debug    
     
     a.each do |node|
-
-      scan_a node[1..-1] if node[1..-1].is_a? Array
       
-      if node.is_a? Array then
-        r = parse_node(node[0])
-        node[0] = r[0]; node.insert 1, r[1], r[2]        
-      end
+      puts 'node: ' + node.inspect if @debug
+      
+      if node.is_a? Array then      
+        if node[1].is_a?(Array) and node[1][0] =~ /^<\w+/ then
 
+          r = parse_node(node[0])
+          node[0] = r[0]
+          node[2] = node[1][0]
+          node[1] = r[1]
+
+        else
+          
+          scan_a node[1..-1] if node[1..-1].is_a?(Array)
+        
+          puts 'node2: ' + node.inspect if @debug
+
+          r = parse_node(node[0])
+          node[0] = r[0]; node.insert 1, r[1], r[2]        
+
+        end
+      end
     end
         
     if a.first.is_a? String then
@@ -226,8 +240,8 @@ class LineTree
         return [nil,non_element] if non_element
       end      
       
-        r = parse_node(s)
-        a[0] = r[0]; a.insert 1, r[1], r[2]        
+      r = parse_node(s)
+      a[0] = r[0]; a.insert 1, r[1], r[2]        
     end
     
     a
