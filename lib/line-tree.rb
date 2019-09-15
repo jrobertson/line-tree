@@ -62,6 +62,27 @@ class LineTree
     Rexle.new(s).xml declaration: false
     
   end
+  
+  def to_tree()
+    
+    def make_tree_list(a)
+      
+      items = a.inject([]) do |r,x|    
+        
+        if x.is_a? Array then
+          r << make_tree_list(x)
+        else
+          r + ['item', {title: x}]
+        end
+      end
+
+    end
+
+    a = make_tree_list(@to_a)
+    doc = Rexle.new(['tree', {}, *a])
+    doc.xml    
+    
+  end
     
   def to_xml(options={})
     to_doc.xml(options)
