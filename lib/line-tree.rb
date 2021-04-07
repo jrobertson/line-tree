@@ -5,6 +5,19 @@
 require 'rexle'
 
 
+module HashDigx
+  refine Hash do
+    
+    def digx( a)
+
+      self.dig a[0], *a[1..-1].flat_map {|x| [:body, x]}
+
+    end  
+  end
+end
+
+
+
 class LineTree
   using ColouredText
   
@@ -53,6 +66,10 @@ class LineTree
     
   end
   
+  def to_h()
+    build_h(@to_a)
+  end
+  
   def to_html(numbered: false)
     
     @numbered = numbered
@@ -89,6 +106,24 @@ class LineTree
   end
 
   private
+  
+  def build_h(a)
+
+    a.inject({}) do |r,x|
+
+      h2 = if x.is_a? Array and x.length > 1 then
+
+        {x[0] => {summary: {}, body: build_h(x[1..-1]) } }
+
+      else
+
+        {x[0] => {summary: {}}}
+      end
+
+      r.merge(h2)
+
+    end
+  end
   
   def encap(a)
         
