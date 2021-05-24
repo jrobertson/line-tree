@@ -41,7 +41,7 @@ class LineTree
     
     lines = ignore_blank_lines ? s.gsub(/^ *$\n/,'') : s
     puts ('lines : ' + lines.inspect).debug if @debug
-    @to_a = scan_shift(lines.strip, level)
+    @to_a = scan_shift(lines.lstrip, level)
     
   end
   
@@ -208,7 +208,7 @@ class LineTree
 
       puts 'x: ' + x.inspect if @debug
       
-      x.sub!(/ *$/,'')
+      #jr240521 x.sub!(/ *$/,'')
       
       if @ignore_label == true or not x[/.*/][/^ *\w+:\S+/] then
 
