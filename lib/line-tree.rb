@@ -20,8 +20,6 @@ end
 
 class LineTree
   using ColouredText
-  
-  attr_reader :to_a
 
   def initialize(raw_s, level: nil, ignore_non_element: true, 
                  ignore_blank_lines: true, ignore_label: false, 
@@ -43,6 +41,10 @@ class LineTree
     puts ('lines : ' + lines.inspect).debug if @debug
     @to_a = scan_shift(lines.lstrip, level)
     
+  end
+  
+  def to_a(normalize: false)
+    normalize ? norm(@to_a) : @to_a
   end
   
   def to_doc(encapsulate: false)    
@@ -78,6 +80,39 @@ class LineTree
     puts s if @debug
     Rexle.new(s).xml declaration: false
     
+  end
+
+  #  key–value pair returns Hash object describing a
+  #  flat representation of a tree
+  #
+  def to_kv_pair
+
+    def scan2keypair(h, trail=nil)
+
+      h.inject([]) do |r,x|
+
+        if x.last.is_a? String then
+
+          key, val = x
+
+          new_key = if r.last and r.last.first.length > 0 then
+            key.to_s
+          else
+            key.to_s
+          end
+          r << [[trail, new_key].compact.join('/'), val]
+        else
+          new_key = x.first.to_s
+          r << [new_key, x.last.first]
+          r.concat scan2keypair(x.last.last, [trail, new_key].compact.join('/'))
+        end
+
+      end
+
+    end
+
+    scan2keypair(self.to_h).to_h
+
   end
   
   def to_tree()
@@ -193,6 +228,30 @@ class LineTree
     items.join("\n")
 
   end
+  
+  # Improves readability by removing unnecessary brackets from an Array row. 
+  # Thus making it a String when there are no children.
+  #
+  def norm(a)
+
+    a.map do |x|
+
+      if x.is_a? Array then
+        
+        if x.length < 2 then 
+          x.first
+        else
+          row = norm(x[1..-1])
+          [x.first, row]
+        end
+        
+      else
+        x
+      end
+      
+    end
+  end
+
   
 
   def scan_shift(lines, level=nil)
